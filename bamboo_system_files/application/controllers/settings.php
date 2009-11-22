@@ -8,6 +8,7 @@ class Settings extends MY_Controller {
 		$this->load->library('validation');
 		$this->load->helper(array('logo', 'file', 'form', 'path'));
 		$this->load->model('settings_model');
+		$this->load->model('currencies_model');
 	}
 
 	// --------------------------------------------------------------------
@@ -55,7 +56,8 @@ class Settings extends MY_Controller {
 							'primary_contact' => $this->input->post('primary_contact'),
 							'primary_contact_email' => $this->input->post('primary_contact_email'),
 							'invoice_note_default' => $this->input->post('invoice_note_default'),
-							'currency_type' => $this->input->post('currency_type'),
+//							'currency_type' => $this->input->post('currency_type'),
+							'currency_type' => $this->input->post('currency_code'),
 							'currency_symbol' => $this->input->post('currency_symbol'),
 							'days_payment_due' => (int) $this->input->post('days_payment_due'),
 							'tax_code' => $this->input->post('tax_code'),
@@ -73,7 +75,7 @@ class Settings extends MY_Controller {
 
 			// Logo uploading
 			$config['upload_path'] 		= './img/logo/';
-			$config['allowed_types'] 	= 'gif|jpg';
+			$config['allowed_types'] 	= 'gif|jpg|png';
 			$config['max_size'] 		= '500'; 
 			$config['max_width'] 		= '900';
 			$config['max_height'] 		= '200'; // these are WAY more then someone should need for a logo
@@ -144,7 +146,7 @@ class Settings extends MY_Controller {
 		$rules['password_confirm']	= "matches[password]";
 		$rules['logo'] 				= "trim|prep_for_form|max_length[50]";
 		$rules['invoice_note_default'] = "trim|prep_for_form|max_length[2000]";
-		$rules['currency_type'] 	= "trim|prep_for_form|max_length[20]";
+		$rules['currency_type'] 	= "trim|prep_for_form|max_length[3]";
 		$rules['currency_symbol'] 	= "ltrim|max_length[9]";
 		$rules['days_payment_due'] 	= "trim|prep_for_form|numeric|max_length[3]";
 		$rules['tax_code'] 			= "trim|prep_for_form|max_length[50]";

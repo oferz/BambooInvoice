@@ -29,6 +29,7 @@ if (isset($total_rows) && $total_rows == 0):
 	foreach($query->result() as $row): 
 
 		$invoice_date = mysql_to_unix($row->dateIssued);
+		$currency_symbol = $this->currencies_model->getCurrencySymbol($row->currency_code);
 		if ($last_retrieved_month != date('F', $invoice_date) && $display_month):
 ?>
 
@@ -47,7 +48,7 @@ if (isset($total_rows) && $total_rows == 0):
 		<td><?php echo anchor('invoices/view/'.$row->id, $row->invoice_number);?></td>
 		<td><?php echo anchor('invoices/view/'.$row->id, $display_date);?></td>
 		<td class="cName"><?php echo anchor('invoices/view/'.$row->id, $row->name);?> <span class="short_description"><?php echo $short_description[$row->id]?></span></td>
-		<td><?php echo anchor('invoices/view/'.$row->id, $this->settings_model->get_setting('currency_symbol') . number_format($row->subtotal, 2, $this->config->item('currency_decimal'), ''));?></td>
+		<td><?php echo anchor('invoices/view/'.$row->id, $currency_symbol . number_format($row->subtotal, 2, $this->config->item('currency_decimal'), ''));?></td>
 		<td>
 		<?php
 		if ($row->amount_paid >= ($row->subtotal + .01))

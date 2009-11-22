@@ -85,6 +85,22 @@ $this->load->view('invoices/invoice_new');
 			<?php echo $this->lang->line('invoice_tax_status');?>: 
 			<?php echo ($client->tax_status) ? $this->lang->line('invoice_taxable') : $this->lang->line('invoice_not_taxable');?>
 		</p>
+			
+		<p>
+			<?php echo $this->lang->line('settings_currency_type');?>: 
+			<?php 
+				if ($client->currency_code != NULL and $client->currency_code != '')
+				{
+					$currencyInfo = $this->currencies_model->getCurrencyInfo($client->currency_code);
+					echo $currencyInfo->country . "&nbsp;(" . $currencyInfo->currency_name . ")"; 
+				}
+				else
+				{
+					$currencyInfo = $this->currencies_model->getCurrencyInfo($this->currencies_model->getDefaultCurrency());
+					echo $this->lang->line('clients_use_default_sys_currency') . "&nbsp;(" . $currencyInfo->currency_name . ")"; 
+				}
+			?>
+		</p>
 
 		<p class="client_options">
 			<?php echo anchor('clients/notes/'.$client->id, $this->lang->line('clients_notes'), array('class' => 'client_notes'));?> | 

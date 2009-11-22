@@ -26,6 +26,11 @@ class Reports extends MY_Controller {
 		//earliest year
 		$earliest_year = substr($this->db->select('MIN(`dateIssued`) AS dateIssued', FALSE)->get('invoices')->row()->dateIssued, 0, 4);
 
+		if (!$earliest_year)
+		{
+			$earliest_year = date('Y');
+		}
+		
 		$data['years'] = array();
 
 		while($earliest_year <= date('Y'))

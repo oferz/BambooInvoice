@@ -8,11 +8,11 @@ $this->load->view('header');
 series. It is outside the form, and thus will not submit (as an empty item) with the 
 rest of the itemized items. -->
 <div id="itemized_invoice_node" style="display: none;">
-<p><label><?php echo $this->lang->line('invoice_item');?> <input type="text" class="item" name="item" size="40" /></label> <label><?php echo $this->lang->line('invoice_quantity');?> <input type="text" class="quantity" name="quantity" size="5" value="1" onblur="recalculate_items();" /></label> <label><?php echo $this->lang->line('invoice_amount');?> <?php echo $this->settings_model->get_setting('currency_symbol');?><input type="text" class="amount" name="amount" size="5" value="0.00" onblur="recalculate_items();" /></label></p>
+<p><label><?php echo $this->lang->line('invoice_item');?> <input type="text" class="item" name="item" size="40" /></label> <label><?php echo $this->lang->line('invoice_quantity');?> <input type="text" class="quantity" name="quantity" size="5" value="1" onblur="recalculate_items();" /></label> <label><?php echo $this->lang->line('invoice_amount');?> <?php echo $currency_symbol;?><input type="text" class="amount" name="amount" size="5" value="0.00" onblur="recalculate_items();" /></label></p>
 </div>
 
 <?php echo form_open('invoices/newinvoice', array('id' => 'createInvoice', 'name' => 'my_form', 'autocomplete' => 'off'));?>
-	<input type="hidden" name="client_id" value="<?php echo $row->id;?>" />
+	<input type="hidden" name="client_id" value="<?php echo $row->id; ?>" />
 <?php if ($row->tax_status):?>
 	<input type="hidden" name="tax1_description" value="<?php echo $tax1_desc;?>" />
 	<input type="hidden" name="tax1_rate" value="<?php echo $tax1_rate;?>" />
@@ -26,9 +26,18 @@ rest of the itemized items. -->
 	<p id="dateIssuedContainer">
 		<label><?php echo $this->lang->line('invoice_date_issued_full');?> <input type="text" name="dateIssued" id="dateIssued" value="<?php echo $invoiceDate; ?>"/></label><?php echo $this->validation->dateIssued_error; ?>
 	</p>
-<div id="cal1Container" style="display: none;">
-<?php echo js_calendar_write('entry_date', time(), true);?>
-</div>
+	<div id="cal1Container" style="display: none;">
+	<?php echo js_calendar_write('entry_date', time(), true);?>
+	</div>
+
+	<p id="current_currency_container">
+		<label>
+			<?php echo $this->lang->line('invoice_current_currency');?>: 
+			<span id="currency_selector_container">
+				<?php echo $this->load->view('currencies/selection_list', array('selected_currency'=>$selected_currency)); ?>
+			</span>
+		</label>
+	</p>
 
 <div class="work_description">
 	<table class="invoice_items">
@@ -52,7 +61,7 @@ rest of the itemized items. -->
 				</p>
 			</td>
 			<td><p><label><input type="checkbox" name="items[1][taxable]" value="1" onclick="recalculate_items();" <?php if ($row->tax_status) {echo 'checked="checked" ';}?>/><span><?php echo $this->lang->line('invoice_taxable');?>?</span></label></p></td>
-			<td nowrap="nowrap"><p><label><span><?php echo $this->lang->line('invoice_amount');?></span><?php echo $this->settings_model->get_setting('currency_symbol');?><input type="text" id="amount" name="items[1][amount]" size="5" value="0.00" onkeyup="recalculate_items();" value="" /></label></p></td>
+			<td nowrap="nowrap"><p><?php echo $currency_symbol;?> <label><input type="text" id="amount" name="items[1][amount]" size="5" value="0.00" onkeyup="recalculate_items();" value="" /></label></p></td>
 			<td>&nbsp;</td>
 		</tr>
 		</tbody>
@@ -63,13 +72,13 @@ rest of the itemized items. -->
 </div>
 
 <div class="amount_listing">
-	<p><?php echo $this->lang->line('invoice_amount');?> <?php echo $this->settings_model->get_setting('currency_symbol');?><span id="item_amount">0.00</span></p>
+	<p><?php echo $this->lang->line('invoice_amount');?> <?php echo $currency_symbol;?><span id="item_amount">0.00</span></p>
 <?php if ($row->tax_status):?>
-	<p><?php echo $tax1_desc;?> (<?php echo $tax1_rate;?>%) <?php echo $this->settings_model->get_setting('currency_symbol');?><span id="item_tax1amount">0.00</span></p>
+	<p><?php echo $tax1_desc;?> (<?php echo $tax1_rate;?>%) <?php echo $currency_symbol;?><span id="item_tax1amount">0.00</span></p>
 	<?php if ($tax2_rate != 0):?>
-	<p><?php echo $tax2_desc;?> (<?php echo $tax2_rate;?>%) <?php echo $this->settings_model->get_setting('currency_symbol');?><span id="item_tax2amount">0.00</span></p>
+	<p><?php echo $tax2_desc;?> (<?php echo $tax2_rate;?>%) <?php echo $currency_symbol;?><span id="item_tax2amount">0.00</span></p>
 	<?php endif;?>
-	<p><?php echo $this->lang->line('invoice_total');?> <?php echo $this->settings_model->get_setting('currency_symbol');?><span id="item_total_amount">0.00</span></p>
+	<p><?php echo $this->lang->line('invoice_total');?> <?php echo $currency_symbol;?><span id="item_total_amount">0.00</span></p>
 <?php else:?>
 	<p class="error"><?php echo $this->lang->line('invoice_tax_exempt');?></p>
 <?php endif;?>

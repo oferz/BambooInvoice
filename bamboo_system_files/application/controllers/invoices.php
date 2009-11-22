@@ -10,6 +10,7 @@ class Invoices extends MY_Controller {
 		$this->load->library('pagination');
 		$this->load->model('invoices_model');
 		$this->load->model('clients_model');
+		$this->load->model('currencies_model');
 	}
 
 	// --------------------------------------------------------------------
@@ -171,6 +172,11 @@ class Invoices extends MY_Controller {
 		}
 
 		$data['row'] = $this->clients_model->get_client_info($id); // used to extract name, id and tax info
+		
+		$default_currency = $this->currencies_model->getCurrencyInfo( $this->clients_model->getClientCurrency($id) );
+		$data['selected_currency'] = $default_currency->currency_code;
+		$data['currency_symbol'] = $this->currencies_model->getCurrencySymbol($data['selected_currency']);
+		$data['currencies'] = $this->currencies_model->getAllCurrencies();
 
 		$data['tax1_desc'] = $this->settings_model->get_setting('tax1_desc');
 		$data['tax1_rate'] = $this->settings_model->get_setting('tax1_rate');
@@ -206,12 +212,13 @@ class Invoices extends MY_Controller {
 			$invoice_data = array(
 									'client_id' => $this->input->post('client_id'),
 									'invoice_number' => $this->input->post('invoice_number'),
-									'dateIssued' => $this->input->post('dateIssued'),
-									'tax1_desc' => $this->input->post('tax1_description'),
-									'tax1_rate' => $this->input->post('tax1_rate'),
-									'tax2_desc' => $this->input->post('tax2_description'),
-									'tax2_rate' => $this->input->post('tax2_rate'),
-									'invoice_note' => $this->input->post('invoice_note')
+									'dateIssued' 	=> $this->input->post('dateIssued'),
+									'currency_code' => $this->input->post('currency_code'),
+									'tax1_desc' 	=> $this->input->post('tax1_description'),
+									'tax1_rate' 	=> $this->input->post('tax1_rate'),
+									'tax2_desc' 	=> $this->input->post('tax2_description'),
+									'tax2_rate' 	=> $this->input->post('tax2_rate'),
+									'invoice_note' 	=> $this->input->post('invoice_note')
 								);
 
 			$invoice_id = $this->invoices_model->addInvoice($invoice_data);
@@ -280,6 +287,8 @@ class Invoices extends MY_Controller {
 		if ($invoiceInfo->num_rows() == 0) {redirect('invoices/');}
 
 		$data['row'] = $invoiceInfo->row();
+		
+		$data['currency_symbol'] = $this->currencies_model->getCurrencySymbol($data['row']->currency_code);
 
 		$data['date_invoice_issued'] = formatted_invoice_date($data['row']->dateIssued);
 		$data['date_invoice_due'] = formatted_invoice_date($data['row']->dateIssued, $this->settings_model->get_setting('days_payment_due'));
@@ -304,17 +313,17 @@ class Invoices extends MY_Controller {
 		$data['items'] = $this->invoices_model->getInvoiceItems($id);
 
 		// begin amount and taxes
-		$data['total_no_tax'] = $this->lang->line('invoice_amount').': '.$this->settings_model->get_setting('currency_symbol').number_format($data['row']->total_notax, 2, $this->config->item('currency_decimal'), '')."<br />\n";
+		$data['total_no_tax'] = $this->lang->line('invoice_amount').': '.$data['currency_symbol'].number_format($data['row']->total_notax, 2, $this->config->item('currency_decimal'), '')."<br />\n";
 
 		$data['tax_info'] = $this->_tax_info($data['row']);
 
-		$data['total_with_tax'] = $this->lang->line('invoice_total').': '.$this->settings_model->get_setting('currency_symbol').number_format($data['row']->total_with_tax, 2, $this->config->item('currency_decimal'), '')."<br />\n";;
+		$data['total_with_tax'] = $this->lang->line('invoice_total').': '.$data['currency_symbol'].number_format($data['row']->total_with_tax, 2, $this->config->item('currency_decimal'), '')."<br />\n";;
 		// end amount and taxes
 
 		if ($data['row']->amount_paid > 0)
 		{
-			$data['total_paid'] = $this->lang->line('invoice_amount_paid').': '.$this->settings_model->get_setting('currency_symbol').number_format($data['row']->amount_paid, 2, $this->config->item('currency_decimal'), '')."<br />\n";;
-			$data['total_outstanding'] = $this->lang->line('invoice_amount_outstanding').': '.$this->settings_model->get_setting('currency_symbol').number_format($data['row']->total_with_tax - $data['row']->amount_paid, 2, $this->config->item('currency_decimal'), '');
+			$data['total_paid'] = $this->lang->line('invoice_amount_paid').': '.$data['currency_symbol'].number_format($data['row']->amount_paid, 2, $this->config->item('currency_decimal'), '')."<br />\n";;
+			$data['total_outstanding'] = $this->lang->line('invoice_amount_outstanding').': '.$data['currency_symbol'].number_format($data['row']->total_with_tax - $data['row']->amount_paid, 2, $this->config->item('currency_decimal'), '');
 		}
 		else
 		{
@@ -342,16 +351,20 @@ class Invoices extends MY_Controller {
 
 		// grab invoice info
 		$data['row'] = $this->invoices_model->getSingleInvoice($id)->row();
+		
 		$data['invoice_number'] = $data['row']->invoice_number;
 		$data['last_number_suggestion'] = '';
 		$data['action'] = 'edit';
+		$data['currency_symbol'] = $this->currencies_model->getCurrencySymbol($data['row']->currency_code);
+		$data['selected_currency'] = $data['row']->currency_code;
+		$data['currencies'] = $this->currencies_model->getAllCurrencies();
 
 		// some hidden form data
 		$data['form_hidden'] = array(
-										'id'	=> $data['row']->id,
-										'tax1_rate'	=> $data['row']->tax1_rate,
+										'id'				=> $data['row']->id,
+										'tax1_rate'			=> $data['row']->tax1_rate,
 										'tax1_description'	=> $data['row']->tax1_desc,
-										'tax2_rate'	=> $data['row']->tax2_rate,
+										'tax2_rate'			=> $data['row']->tax2_rate,
 										'tax2_description'	=> $data['row']->tax2_desc,
 									);
 
@@ -374,9 +387,9 @@ class Invoices extends MY_Controller {
 			$data['items'] = $this->invoices_model->getInvoiceItems($id);
 
 			// begin amount and taxes
-			$data['total_no_tax'] = $this->lang->line('invoice_amount').': '.$this->settings_model->get_setting('currency_symbol').number_format($data['row']->total_notax, 2, $this->config->item('currency_decimal'), '')."<br />\n";
+			$data['total_no_tax'] = $this->lang->line('invoice_amount').': '.$data['currency_symbol'].number_format($data['row']->total_notax, 2, $this->config->item('currency_decimal'), '')."<br />\n";
 			$data['tax_info'] = $this->_tax_info($data['row']);
-			$data['total_with_tax'] = $this->lang->line('invoice_total').': '.$this->settings_model->get_setting('currency_symbol').number_format($data['row']->total_with_tax, 2, $this->config->item('currency_decimal'), '');
+			$data['total_with_tax'] = $this->lang->line('invoice_total').': '.$data['currency_symbol'].number_format($data['row']->total_with_tax, 2, $this->config->item('currency_decimal'), '');
 			// end amount and taxes
 
 			$this->load->view('invoices/edit', $data);
@@ -389,6 +402,7 @@ class Invoices extends MY_Controller {
 											'client_id' 		=> $this->input->post('client_id'),
 											'invoice_number' 	=> $this->input->post('invoice_number'),
 											'dateIssued' 		=> $this->input->post('dateIssued'),
+											'currency_code' 	=> $this->input->post('currency_code'),
 											'tax1_desc' 		=> $this->input->post('tax1_description'),
 											'tax1_rate' 		=> $this->input->post('tax1_rate'),
 											'tax2_desc' 		=> $this->input->post('tax2_description'),
@@ -432,11 +446,11 @@ class Invoices extends MY_Controller {
 				$data['items'] = $this->invoices_model->getInvoiceItems($id);
 
 				// begin amount and taxes
-				$data['total_no_tax'] = $this->lang->line('invoice_amount').': '.$this->settings_model->get_setting('currency_symbol').number_format($data['row']->total_notax, 2, $this->config->item('currency_decimal'), '')."<br />\n";
+				$data['total_no_tax'] = $this->lang->line('invoice_amount').': '.$data['currency_symbol'].number_format($data['row']->total_notax, 2, $this->config->item('currency_decimal'), '')."<br />\n";
 
 				$data['tax_info'] = $this->_tax_info($data['row']);
 
-				$data['total_with_tax'] = $this->lang->line('invoice_total').': '.$this->settings_model->get_setting('currency_symbol').number_format($data['row']->total_with_tax, 2, $this->config->item('currency_decimal'), '');
+				$data['total_with_tax'] = $this->lang->line('invoice_total').': '.$data['currency_symbol'].number_format($data['row']->total_with_tax, 2, $this->config->item('currency_decimal'), '');
 				// end amount and taxes
 
 				$this->load->view('invoices/edit', $data);
@@ -454,12 +468,15 @@ class Invoices extends MY_Controller {
 		// grab invoice info
 		$data['row'] = $this->invoices_model->getSingleInvoice($id)->row();
 		$data['action'] = 'duplicate';
+		$data['currency_symbol'] = $this->currencies_model->getCurrencySymbol($data['row']->currency_code);
+		$data['selected_currency'] = $data['row']->currency_code;
+		$data['currencies'] = $this->currencies_model->getAllCurrencies();
 
 		// some hidden form data
 		$data['form_hidden'] = array(
-										'tax1_rate'	=> $data['row']->tax1_rate,
+										'tax1_rate'			=> $data['row']->tax1_rate,
 										'tax1_description'	=> $data['row']->tax1_desc,
-										'tax2_rate'	=> $data['row']->tax2_rate,
+										'tax2_rate'			=> $data['row']->tax2_rate,
 										'tax2_description'	=> $data['row']->tax2_desc,
 									);
 
@@ -487,9 +504,9 @@ class Invoices extends MY_Controller {
 			$data['items'] = $this->invoices_model->getInvoiceItems($id);
 
 			// begin amount and taxes
-			$data['total_no_tax'] = $this->lang->line('invoice_amount').': '.$this->settings_model->get_setting('currency_symbol').number_format($data['row']->total_notax, 2, $this->config->item('currency_decimal'), '')."<br />\n";
+			$data['total_no_tax'] = $this->lang->line('invoice_amount').': '.$data['currency_symbol'].number_format($data['row']->total_notax, 2, $this->config->item('currency_decimal'), '')."<br />\n";
 			$data['tax_info'] = $this->_tax_info($data['row']);
-			$data['total_with_tax'] = $this->lang->line('invoice_total').': '.$this->settings_model->get_setting('currency_symbol').number_format($data['row']->total_with_tax, 2, $this->config->item('currency_decimal'), '');
+			$data['total_with_tax'] = $this->lang->line('invoice_total').': '.$data['currency_symbol'].number_format($data['row']->total_with_tax, 2, $this->config->item('currency_decimal'), '');
 			// end amount and taxes
 
 			$this->load->view('invoices/edit', $data);
@@ -502,6 +519,7 @@ class Invoices extends MY_Controller {
 										'client_id' => $this->input->post('client_id'),
 										'invoice_number' => $this->input->post('invoice_number'),
 										'dateIssued' => $this->input->post('dateIssued'),
+										'currency_code' 	=> $this->input->post('currency_code'),
 										'tax1_desc' => $this->input->post('tax1_description'),
 										'tax1_rate' => $this->input->post('tax1_rate'),
 										'tax2_desc' => $this->input->post('tax2_description'),
@@ -542,11 +560,11 @@ class Invoices extends MY_Controller {
 				$data['items'] = $this->invoices_model->getInvoiceItems($id);
 
 				// begin amount and taxes
-				$data['total_no_tax'] = $this->lang->line('invoice_amount').': '.$this->settings_model->get_setting('currency_symbol').number_format($data['row']->total_notax, 2, $this->config->item('currency_decimal'), '')."<br />\n";
+				$data['total_no_tax'] = $this->lang->line('invoice_amount').': '.$data['currency_symbol'].number_format($data['row']->total_notax, 2, $this->config->item('currency_decimal'), '')."<br />\n";
 
 				$data['tax_info'] = $this->_tax_info($data['row']);
 
-				$data['total_with_tax'] = $this->lang->line('invoice_total').': '.$this->settings_model->get_setting('currency_symbol').number_format($data['row']->total_with_tax, 2, $this->config->item('currency_decimal'), '');
+				$data['total_with_tax'] = $this->lang->line('invoice_total').': '.$data['currency_symbol'].number_format($data['row']->total_with_tax, 2, $this->config->item('currency_decimal'), '');
 				// end amount and taxes
 
 				$this->load->view('invoices/edit', $data);
@@ -577,12 +595,14 @@ class Invoices extends MY_Controller {
 		$this->load->model('clientcontacts_model');
 		$this->load->model('invoice_histories_model', '', TRUE);
 		$data['page_title'] = 'invoice';
+		$currency_spacer = '&nbsp;&nbsp;&nbsp;';
 
 		// configure email to be sent
 		$data['companyInfo'] = $this->settings_model->getCompanyInfo()->row();
 		$data['company_logo'] = $this->_get_logo('_pdf', 'pdf');
 
 		$data['row'] = $this->invoices_model->getSingleInvoice($id)->row();
+		$data['currency_symbol'] = $this->currencies_model->getCurrencySymbol($data['row']->currency_code);
 
 		$invoiceInfo = $this->invoices_model->getSingleInvoice($id);
 		if ($invoiceInfo->num_rows() == 0) {redirect('invoices/');}
@@ -597,17 +617,17 @@ class Invoices extends MY_Controller {
 		$items = $this->invoices_model->getInvoiceItems($id);
 
 		$data['items'] = $items;
-		$data['total_no_tax'] = $this->lang->line('invoice_amount').': '.$this->settings_model->get_setting('currency_symbol').number_format($data['row']->total_notax, 2, $this->config->item('currency_decimal'), '')."<br />\n";
+		$data['total_no_tax'] = $this->lang->line('invoice_amount').': '.$data['currency_symbol'].$currency_spacer.number_format($data['row']->total_notax, 2, $this->config->item('currency_decimal'), '')."<br />\n";
 
 		// taxes
 		$data['tax_info'] = $this->_tax_info($data['row']);
 
-		$data['total_with_tax'] = $this->lang->line('invoice_total').': '.$this->settings_model->get_setting('currency_symbol').number_format($data['row']->total_with_tax, 2, $this->config->item('currency_decimal'), '')."<br />\n";;
+		$data['total_with_tax'] = $this->lang->line('invoice_total').': '.$data['currency_symbol'].$currency_spacer.number_format($data['row']->total_with_tax, 2, $this->config->item('currency_decimal'), '')."<br />\n";;
 
 		if ($data['row']->amount_paid > 0)
 		{
-			$data['total_paid'] = $this->lang->line('invoice_amount_paid').': '.$this->settings_model->get_setting('currency_symbol').number_format($data['row']->amount_paid, 2, $this->config->item('currency_decimal'), '')."<br />\n";;
-			$data['total_outstanding'] = $this->lang->line('invoice_amount_outstanding').': '.$this->settings_model->get_setting('currency_symbol').number_format($data['row']->total_with_tax - $data['row']->amount_paid, 2, $this->config->item('currency_decimal'), '');
+			$data['total_paid'] = $this->lang->line('invoice_amount_paid').': '.$data['currency_symbol'].$currency_spacer.number_format($data['row']->amount_paid, 2, $this->config->item('currency_decimal'), '')."<br />\n";;
+			$data['total_outstanding'] = $this->lang->line('invoice_amount_outstanding').': '.$data['currency_symbol'].$currency_spacer.number_format($data['row']->total_with_tax - $data['row']->amount_paid, 2, $this->config->item('currency_decimal'), '');
 		}
 		else
 		{
@@ -668,6 +688,13 @@ class Invoices extends MY_Controller {
 		{
 			$this->email->bcc($data['companyInfo']->primary_contact_email);
 		}
+		
+		// should we ask for return receipt?
+		if ($this->input->post('return_receipt') == 'y')
+		{
+			$this->email->_set_header('Disposition-Notification-To', $data['companyInfo']->primary_contact_email);
+		}
+		
 
 		$email_body = $this->input->post('email_body');
 
@@ -717,6 +744,7 @@ class Invoices extends MY_Controller {
 		$this->lang->load('date');
 		$this->load->plugin('to_pdf');
 		$this->load->helper('file');
+		
 
 		$data['page_title'] = $this->lang->line('menu_invoices');
 
@@ -725,6 +753,8 @@ class Invoices extends MY_Controller {
 		if ($invoiceInfo->num_rows() == 0) {redirect('invoices/');}
 
 		$data['row'] = $invoiceInfo->row();
+		$data['currency_symbol'] = $this->currencies_model->getCurrencySymbol($data['row']->currency_code);
+		$currency_spacer = '&nbsp;&nbsp;&nbsp;';
 
 		$data['client_note'] = $this->clients_model->get_client_info($data['row']->client_id)->client_notes;
 
@@ -736,17 +766,17 @@ class Invoices extends MY_Controller {
 
 		$data['items'] = $this->invoices_model->getInvoiceItems($id);
 
-		$data['total_no_tax'] = $this->lang->line('invoice_amount').': '.$this->settings_model->get_setting('currency_symbol').number_format($data['row']->total_notax, 2, $this->config->item('currency_decimal'), '')."<br />\n";
+		$data['total_no_tax'] = $this->lang->line('invoice_amount').': '.$data['currency_symbol'].$currency_spacer.number_format($data['row']->total_notax, 2, $this->config->item('currency_decimal'), '')."<br />\n";
 
 		// taxes
 		$data['tax_info'] = $this->_tax_info($data['row']);
 
-		$data['total_with_tax'] = $this->lang->line('invoice_total').': '.$this->settings_model->get_setting('currency_symbol').number_format($data['row']->total_with_tax, 2, $this->config->item('currency_decimal'), '')."<br />\n";;
+		$data['total_with_tax'] = $this->lang->line('invoice_total').': '.$data['currency_symbol'].$currency_spacer.number_format($data['row']->total_with_tax, 2, $this->config->item('currency_decimal'), '')."<br />\n";;
 
 		if ($data['row']->amount_paid > 0)
 		{
-			$data['total_paid'] = $this->lang->line('invoice_amount_paid').': '.$this->settings_model->get_setting('currency_symbol').number_format($data['row']->amount_paid, 2, $this->config->item('currency_decimal'), '')."<br />\n";;
-			$data['total_outstanding'] = $this->lang->line('invoice_amount_outstanding').': '.$this->settings_model->get_setting('currency_symbol').number_format($data['row']->total_with_tax - $data['row']->amount_paid, 2, $this->config->item('currency_decimal'), '');
+			$data['total_paid'] = $this->lang->line('invoice_amount_paid').': '.$data['currency_symbol'].$currency_spacer.number_format($data['row']->amount_paid, 2, $this->config->item('currency_decimal'), '')."<br />\n";;
+			$data['total_outstanding'] = $this->lang->line('invoice_amount_outstanding').': '.$data['currency_symbol'].$currency_spacer.number_format($data['row']->total_with_tax - $data['row']->amount_paid, 2, $this->config->item('currency_decimal'), '');
 		}
 		else
 		{
@@ -901,11 +931,16 @@ class Invoices extends MY_Controller {
 					$due_date = $invoice_date + ($this->settings_model->get_setting('days_payment_due') * 60*60*24); 
 					$invoiceResults .= timespan($due_date, now()). ' '.$this->lang->line('invoice_overdue');
 				}
+				$invoiceResults .= '"';
+				
+				// Currencies (Added by O.Z)
+				$invoiceResults .= ', "currency" : "' . $this->currencies_model->getCurrencySymbol($row->currency_code, false) . '"';
 
-				$invoiceResults .= '" }, ';
+				$invoiceResults .= ' }, ';
 				$last_retrieved_month = date('F', $invoice_date);
 			}
 			$invoiceResults = rtrim($invoiceResults, ', ').']}';
+			header('Content-type: text/javascript');
 			echo $invoiceResults;
 		}
 	}
@@ -949,16 +984,17 @@ class Invoices extends MY_Controller {
 
 	function _tax_info($data)
 	{
+		$currency_spacer = '&nbsp;&nbsp;&nbsp;';
 		$tax_info = '';
 
 		if ($data->total_tax1 != 0)
 		{
-			$tax_info .= $data->tax1_desc." (".$data->tax1_rate."%): ".$this->settings_model->get_setting('currency_symbol').number_format($data->total_tax1, 2, $this->config->item('currency_decimal'), '')."<br />\n";
+			$tax_info .= $data->tax1_desc." (".$data->tax1_rate."%): ".$this->currencies_model->getCurrencySymbol($data->currency_code).$currency_spacer.number_format($data->total_tax1, 2, $this->config->item('currency_decimal'), '')."<br />\n";
 		}
 
 		if ($data->total_tax2 != 0)
 		{
-			$tax_info .= $data->tax2_desc." (".$data->tax2_rate."%): ".$this->settings_model->get_setting('currency_symbol').number_format($data->total_tax2, 2, $this->config->item('currency_decimal'), '')."<br />\n";
+			$tax_info .= $data->tax2_desc." (".$data->tax2_rate."%): ".$this->currencies_model->getCurrencySymbol($data->currency_code).$currency_spacer.number_format($data->total_tax2, 2, $this->config->item('currency_decimal'), '')."<br />\n";
 		}
 
 		return $tax_info;
@@ -972,6 +1008,7 @@ class Invoices extends MY_Controller {
 		$rules['invoice_number'] 	= 'trim|required|htmlspecialchars|max_length[12]|alpha_dash|callback_uniqueInvoice';
 		$rules['dateIssued'] 		= 'trim|htmlspecialchars|callback_dateIssued';
 		$rules['invoice_note'] 		= 'trim|htmlspecialchars|max_length[2000]';
+		$rules['currency_code'] 	= 'trim|htmlspecialchars|max_length[3]';
 		$rules['tax1_description'] 	= 'trim|htmlspecialchars|max_length[50]';
 		$rules['tax1_rate'] 		= 'trim|htmlspecialchars';
 		$rules['tax2_description'] 	= 'trim|htmlspecialchars|max_length[50]';
@@ -982,6 +1019,7 @@ class Invoices extends MY_Controller {
 		$fields['invoice_number'] 	= $this->lang->line('invoice_number');
 		$fields['dateIssued'] 		= $this->lang->line('invoice_date_issued');
 		$fields['invoice_note'] 	= $this->lang->line('invoice_note');
+		$fields['currency_code'] 	= $this->lang->line('currency_code');
 		$fields['tax1_description']	= $this->settings_model->get_setting('tax1_desc');
 		$fields['tax1_rate'] 		= $this->settings_model->get_setting('tax1_rate');
 		$fields['tax2_description']	= $this->settings_model->get_setting('tax1_desc');
@@ -999,6 +1037,7 @@ class Invoices extends MY_Controller {
 		$rules['invoice_number'] 	= 'trim|required|htmlspecialchars|max_length[50]|alpha_dash';
 		$rules['dateIssued'] 		= 'trim|htmlspecialchars|callback_dateIssued';
 		$rules['invoice_note'] 		= 'trim|htmlspecialchars|max_length[2000]';
+		$rules['currency_code'] 	= 'trim|htmlspecialchars|max_length[3]';
 		$rules['tax1_description'] 	= 'trim|htmlspecialchars|max_length[50]';
 		$rules['tax1_rate'] 		= 'trim|htmlspecialchars';
 		$rules['tax2_description'] 	= 'trim|htmlspecialchars|max_length[50]';
@@ -1009,6 +1048,7 @@ class Invoices extends MY_Controller {
 		$fields['invoice_number'] 	= $this->lang->line('invoice_number');
 		$fields['dateIssued'] 		= $this->lang->line('invoice_date_issued');
 		$fields['invoice_note'] 	= $this->lang->line('invoice_note');
+		$fields['currency_code'] 	= $this->lang->line('currency_code');
 		$fields['tax1_description']	= $this->settings_model->get_setting('tax1_desc');
 		$fields['tax1_rate'] 		= $this->settings_model->get_setting('tax1_rate');
 		$fields['tax2_description']	= $this->settings_model->get_setting('tax1_desc');

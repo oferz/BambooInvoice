@@ -10,6 +10,8 @@ function init() {
 	recalculate_items();
 
 	item_count = $$('#item_area .item_row').length;
+	
+	Event.observe('currency_selector', 'change', currencyChanged);
 }
 
 
@@ -104,6 +106,10 @@ function create_itemized_fields()
 
 	var td = document.createElement('td');
 	var p = document.createElement('p');
+	var curSymbol = document.createElement('span');
+	curSymbol.setAttribute('class', 'currency_symbol');
+	curSymbol.appendChild(document.createTextNode(getCurrenctCurrencySymbol()));
+	var curSymbolTxt = document.createTextNode(lang_amount);
 	var label = document.createElement('label');
 	var span = document.createElement('span');
 	var theData = document.createTextNode(lang_amount);
@@ -116,8 +122,10 @@ function create_itemized_fields()
 	theInput.setAttribute('onkeyup', 'recalculate_items();');
 	span.appendChild(theData);
 	label.appendChild(span);
-	label.appendChild(document.createTextNode(bi_currency_symbol));
+//	label.appendChild(document.createTextNode(bi_currency_symbol));
 	label.appendChild(theInput);
+	p.appendChild(curSymbol);
+	p.appendChild(document.createTextNode(' '));
 	p.appendChild(label);
 	td.appendChild(p);
 	row.appendChild(td);
@@ -157,5 +165,20 @@ function recalculate_items()
 		if ($('item_tax2amount')) {$('item_tax2amount').innerHTML = data.tax2_amount;}
 	}})
 }
+
+
+
+function getCurrenctCurrencySymbol()
+{
+	return $('currency_selector').options[$('currency_selector').selectedIndex].label;
+}
+
+function currencyChanged ()
+{
+	var currency_symbol = getCurrenctCurrencySymbol();
+	$$('.currency_symbol').invoke('update', currency_symbol);
+}
+
+
 
 addEvent(window,'load', init);

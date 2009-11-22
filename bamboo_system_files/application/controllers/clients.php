@@ -7,6 +7,7 @@ class Clients extends MY_Controller {
 		parent::MY_Controller();
 		$this->load->helper('date');
 		$this->load->library('validation');
+		$this->load->model('currencies_model');
 		$this->load->model('clients_model');
 	}
 
@@ -72,6 +73,7 @@ class Clients extends MY_Controller {
 		if ($this->validation->run() == FALSE || $newinv != '')
 		{
 			$data['page_title'] = $this->lang->line('clients_create_new_client');
+			$data['selected_currency'] = '';
 			$this->load->view('clients/newclient', $data);
 		}
 		else
@@ -87,7 +89,8 @@ class Clients extends MY_Controller {
 				'postal_code' => $this->input->post('postal_code'),
 				'website' => $this->input->post('website'),
 				'tax_status' => $this->input->post('tax_status'),
-				'tax_code' => $this->input->post('tax_code')
+				'tax_code' => $this->input->post('tax_code'),
+				'currency_code' => $this->input->post('currency_code')
 			);
 
 			// make insertion, grab insert_id
@@ -151,6 +154,7 @@ class Clients extends MY_Controller {
 			$data['id'] = ($cid) ? $cid : $this->uri->segment(3);
 
 			$data['row'] = $this->clients_model->get_client_info($data['id']);
+			$data['selected_currency'] = $data['row']->currency_code;
 
 			$data['page_title'] = $this->lang->line('clients_edit_client');
 			$this->load->view('clients/edit', $data);
@@ -168,7 +172,8 @@ class Clients extends MY_Controller {
 								'postal_code' => $this->input->post('postal_code'),
 								'website' => $this->input->post('website'),
 								'tax_status' => $this->input->post('tax_status'),
-								'tax_code' => $this->input->post('tax_code')
+								'tax_code' => $this->input->post('tax_code'),
+								'currency_code' => $this->input->post('currency_code')
 								);
 
 			$this->clients_model->updateClient($clientInfo['id'], $clientInfo);
@@ -223,18 +228,20 @@ class Clients extends MY_Controller {
 		$rules['postal_code'] 	= 'trim|htmlspecialchars|max_length[10]';
 		$rules['tax_status'] 	= 'trim|htmlspecialchars|exact_length[1]|numeric|required';
 		$rules['tax_code'] 		= 'max_length[75]';
+		$rules['currency_code'] = 'max_length[3]';
 		$this->validation->set_rules($rules);
 
-		$fields['clientName'] 	= $this->lang->line('clients_name');
-		$fields['website'] 		= $this->lang->line('clients_website');
-		$fields['address1'] 	= $this->lang->line('clients_address1');
-		$fields['address2'] 	= $this->lang->line('clients_address2');
-		$fields['city'] 		= $this->lang->line('clients_cityt');
-		$fields['province'] 	= $this->lang->line('clients_province');
-		$fields['country'] 		= $this->lang->line('clients_country');
-		$fields['postal_code'] 	= $this->lang->line('clients_postal');
-		$fields['tax_status'] 	= $this->lang->line('invoice_tax_status');
-		$fields['tax_code'] 	= $this->lang->line('settings_tax_code');
+		$fields['clientName'] 		= $this->lang->line('clients_name');
+		$fields['website'] 			= $this->lang->line('clients_website');
+		$fields['address1'] 		= $this->lang->line('clients_address1');
+		$fields['address2'] 		= $this->lang->line('clients_address2');
+		$fields['city'] 			= $this->lang->line('clients_cityt');
+		$fields['province'] 		= $this->lang->line('clients_province');
+		$fields['country'] 			= $this->lang->line('clients_country');
+		$fields['postal_code'] 		= $this->lang->line('clients_postal');
+		$fields['tax_status'] 		= $this->lang->line('invoice_tax_status');
+		$fields['tax_code'] 		= $this->lang->line('settings_tax_code');
+		$fields['currency_code']	= $this->lang->line('settings_currency_type');
 		$this->validation->set_fields($fields);
 
 		$this->validation->set_error_delimiters('<span class="error">', '</span>');

@@ -38,6 +38,19 @@ $this->load->view('header');
 		<input type="radio" name="tax_status" id="notax" value="0" /><label for="notax"><?php echo $this->lang->line('invoice_not_taxable');?></label>
 		</p>
 	</fieldset>
+	
+	<p id="current_currency_container">
+		<label>
+			<span><?php echo $this->lang->line('settings_currency_type');?>: </span>
+			<span id="currency_selector_container">
+				<?php echo $this->load->view('currencies/selection_list', array('with_system_default'=>true, 'selected_currency'=>$selected_currency)); ?>
+			</span>
+		</label>
+	</p>
+	
+	<!-- put a spacer between the field and the submit button -->
+	<div style="clear: both; padding: 2px;"/>
+
 
 	<input type="submit" name="createClient" id="createClient" value="<?php echo $this->lang->line('clients_save_client');?>" />
 

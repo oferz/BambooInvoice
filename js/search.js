@@ -125,7 +125,14 @@ function drawTable(invoiceArray) {
 			var container = document.createElement('td');
 			var theLink = document.createElement('a');
 			theLink.setAttribute ('href', base_url+'invoices/view/'+invoiceArray['invoices'][i].invoiceId);
-			var theData = document.createTextNode(bi_currency_symbol+invoiceArray['invoices'][i].amount);
+			// Currency support (by O.Z)
+			var currencyElem = document.createElement('span');
+			currencyElem.className = "currency_symbol";
+			currencyElem.innerHTML = invoiceArray['invoices'][i].currency;
+//			currencyElem.appendChild( document.createTextNode(invoiceArray['invoices'][i].currency) );
+			theLink.appendChild(currencyElem);
+//			var theData = document.createTextNode(bi_currency_symbol+invoiceArray['invoices'][i].amount);
+			var theData = document.createTextNode(invoiceArray['invoices'][i].amount);
 			theLink.appendChild(theData);
 			container.appendChild(theLink);
 			row.appendChild(container);

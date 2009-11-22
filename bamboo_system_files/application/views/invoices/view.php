@@ -47,7 +47,7 @@ if ($row->amount_paid < $row->total_with_tax):
 		<p>
 			<label>
 				<span><?php echo $this->lang->line('invoice_amount');?></span> 
-				<?php echo $this->settings_model->get_setting('currency_symbol');?> 
+				<?php echo $currency_symbol;?> 
 				<input type="text" name="amount" id="amount" maxlength="10" size="10" /> 
 			</label><span id="amountError" class="error"></span>
 		</p>
@@ -86,6 +86,7 @@ if ($row->amount_paid < $row->total_with_tax):
 					<label for="<?php echo 'recipient' . $contactRow->id;?>"><input name="recipients[]" id="<?php echo 'recipient' . $contactRow->id;?>" type="checkbox" value="<?php echo $contactRow->id;?>" /><?php echo $contactRow->first_name . ' ' . $contactRow->last_name;?></label><br />
 					<?php endforeach;?>
 					<br /><label for="primary_contact"><input name="primary_contact" id="primary_contact" type="checkbox" value="y" /><em><?php echo $this->lang->line('invoice_blind_copy_me')?></em></label>
+					<br /><label for="return_receipt"><input name="return_receipt" id="return_receipt" type="checkbox" value="y" /><em><?php echo $this->lang->line('invoice_return_receipt')?></em></label>
 				</p>
 			</fieldset>
 
@@ -167,8 +168,8 @@ if ($row->amount_paid < $row->total_with_tax):
 		<tr>
 			<td><p><?php echo str_replace('.00', '', $item->quantity);?></p></td>
 			<td><?php echo auto_typography($item->work_description);?></td>
-			<td><p><?php echo $this->settings_model->get_setting('currency_symbol') . str_replace('.', $this->config->item('currency_decimal'), $item->amount);?> <?php if ($item->taxable == 0){echo '(' . $this->lang->line('invoice_not_taxable') . ')';}?></p></td>
-			<td><p><?php echo $this->settings_model->get_setting('currency_symbol') . number_format($item->quantity * $item->amount, 2, $this->config->item('currency_decimal'), '');?></p></td>
+			<td><p><?php echo $currency_symbol . str_replace('.', $this->config->item('currency_decimal'), $item->amount);?> <?php if ($item->taxable == 0){echo '(' . $this->lang->line('invoice_not_taxable') . ')';}?></p></td>
+			<td><p><?php echo $currency_symbol . number_format($item->quantity * $item->amount, 2, $this->config->item('currency_decimal'), '');?></p></td>
 		</tr>
 		<?php endforeach;?>
 	</table>
@@ -237,7 +238,7 @@ if ($row->amount_paid < $row->total_with_tax):
 					echo $this->lang->line('cal_' . strtolower(date('F', mysql_to_unix($row->date_paid))));
 					// day and year numbers
 					echo date(' j, Y', mysql_to_unix($row->date_paid));
-					?> : <?php echo $this->settings_model->get_setting('currency_symbol') . $row->amount_paid;?>. <em>&quot;<?php echo ($row->payment_note=="0")?'There was no payment note entered':$row->payment_note;?>&quot;</em>
+					?> : <?php echo $currency_symbol . $row->amount_paid;?>. <em>&quot;<?php echo ($row->payment_note=="0")?'There was no payment note entered':$row->payment_note;?>&quot;</em>
 				</li>
 			<?php
 				endforeach;

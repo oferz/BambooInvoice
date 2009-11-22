@@ -78,3 +78,12 @@ h2 span {
 .invoice_items textarea {
 	width: 100%;
 }
+
+
+.currency_symbol {
+	padding: 0px 0.5em 0px 0.5em;
+}
+
+.currency_selector {
+	width: 200px;
+}

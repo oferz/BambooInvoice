@@ -444,6 +444,176 @@ class Install extends Controller {
 			$updates .= "<li>Upgrade to 0.8.9 success.</li>";
 		}
 
+		// Update to version 0.8.9a
+		$version = $this->db->get('settings')->row()->bambooinvoice_version;
+
+		if ($version == '0.8.9')
+		{
+			// Create the currencies table
+			$currencies_definition = array(
+										'currency_code' 		=> array('type' => 'VARCHAR', 'constraint' => 3),
+										'country' 				=> array('type' => 'VARCHAR', 'constraint' => 40),
+										'currency_name' 		=> array('type' => 'VARCHAR', 'constraint' => 30),
+										'is_value_hex' 			=> array('type' => 'TINYINT', 'constraint' => 1, 'default' => 1),
+										'symbol_html_value' 	=> array('type' => 'VARCHAR', 'constraint' => 30)
+										);
+
+			$this->dbforge->add_field($currencies_definition);
+			$this->dbforge->add_key('currency_code', TRUE);
+			$this->dbforge->create_table('currencies', TRUE);
+			
+			// Add currencies to the currencies table
+			$currencies = array(
+				array('currency_code'=>'ALL', 'country'=>'Albania', 				'currency_name'=>'Leke', 							'is_value_hex'=>1, 'symbol_html_value'=>'4c, 65, 6b'),
+				array('currency_code'=>'USD', 'country'=>'United States of America','currency_name'=>'Dollars', 						'is_value_hex'=>1, 'symbol_html_value'=>'24'),
+				array('currency_code'=>'AFN', 'country'=>'Afghanistan', 			'currency_name'=>'Afghanis', 						'is_value_hex'=>1, 'symbol_html_value'=>'60b'),
+				array('currency_code'=>'ARS', 'country'=>'Argentina', 				'currency_name'=>'Pesos', 							'is_value_hex'=>1, 'symbol_html_value'=>'24'),
+				array('currency_code'=>'AWG', 'country'=>'Aruba', 					'currency_name'=>'Guilders (also called Florins)', 	'is_value_hex'=>1, 'symbol_html_value'=>'192'),
+				array('currency_code'=>'AUD', 'country'=>'Australia', 				'currency_name'=>'Dollars', 						'is_value_hex'=>1, 'symbol_html_value'=>'24'),
+				array('currency_code'=>'AZN', 'country'=>'Azerbaijan', 				'currency_name'=>'New Manats', 						'is_value_hex'=>1, 'symbol_html_value'=>'43c, 430, 43d'),
+				array('currency_code'=>'BSD', 'country'=>'Bahamas', 				'currency_name'=>'Dollars', 						'is_value_hex'=>1, 'symbol_html_value'=>'24'),
+				array('currency_code'=>'BBD', 'country'=>'Barbados', 				'currency_name'=>'Dollars', 						'is_value_hex'=>1, 'symbol_html_value'=>'24'),
+				array('currency_code'=>'BYR', 'country'=>'Belarus', 				'currency_name'=>'Rubles', 							'is_value_hex'=>1, 'symbol_html_value'=>'70, 2e'),
+				array('currency_code'=>'EUR', 'country'=>'European Union (EU)', 	'currency_name'=>'Euro', 							'is_value_hex'=>0, 'symbol_html_value'=>'128'),
+				array('currency_code'=>'BZD', 'country'=>'Belize', 					'currency_name'=>'Dollars', 						'is_value_hex'=>1, 'symbol_html_value'=>'42, 5a, 24'),
+				array('currency_code'=>'BMD', 'country'=>'Bermuda', 				'currency_name'=>'Dollars', 						'is_value_hex'=>1, 'symbol_html_value'=>'24'),
+				array('currency_code'=>'BOB', 'country'=>'Bolivia', 				'currency_name'=>'Bolivianos', 						'is_value_hex'=>1, 'symbol_html_value'=>'24, 62'),
+				array('currency_code'=>'BAM', 'country'=>'Bosnia and Herzegovina', 	'currency_name'=>'Convertible Marka', 				'is_value_hex'=>1, 'symbol_html_value'=>'4b, 4d'),
+				array('currency_code'=>'BWP', 'country'=>'Botswana', 				'currency_name'=>'Pulas', 							'is_value_hex'=>1, 'symbol_html_value'=>'50'),
+				array('currency_code'=>'BGN', 'country'=>'Bulgaria', 				'currency_name'=>'Leva', 							'is_value_hex'=>1, 'symbol_html_value'=>'43b, 432'),
+				array('currency_code'=>'BRL', 'country'=>'Brazil', 					'currency_name'=>'Reais', 							'is_value_hex'=>1, 'symbol_html_value'=>'52, 24'),
+				array('currency_code'=>'GBP', 'country'=>'United Kingdom', 			'currency_name'=>'Pounds', 							'is_value_hex'=>1, 'symbol_html_value'=>'a3'),
+				array('currency_code'=>'BND', 'country'=>'Brunei Darussalam', 		'currency_name'=>'Dollars', 						'is_value_hex'=>1, 'symbol_html_value'=>'24'),
+				array('currency_code'=>'KHR', 'country'=>'Cambodia', 				'currency_name'=>'Riels', 							'is_value_hex'=>1, 'symbol_html_value'=>'17db'),
+				array('currency_code'=>'CAD', 'country'=>'Canada', 					'currency_name'=>'Dollars', 						'is_value_hex'=>1, 'symbol_html_value'=>'24'),
+				array('currency_code'=>'KYD', 'country'=>'Cayman Islands', 			'currency_name'=>'Dollars', 						'is_value_hex'=>1, 'symbol_html_value'=>'24'),
+				array('currency_code'=>'CLP', 'country'=>'Chile', 					'currency_name'=>'Pesos', 							'is_value_hex'=>1, 'symbol_html_value'=>'24'),
+				array('currency_code'=>'CNY', 'country'=>'China', 					'currency_name'=>'Yuan Renminbi', 					'is_value_hex'=>1, 'symbol_html_value'=>'a5'),
+				array('currency_code'=>'COP', 'country'=>'Colombia', 				'currency_name'=>'Pesos', 							'is_value_hex'=>1, 'symbol_html_value'=>'24'),
+				array('currency_code'=>'CRC', 'country'=>'Costa Rica', 				'currency_name'=>'Colón', 							'is_value_hex'=>1, 'symbol_html_value'=>'20a1'),
+				array('currency_code'=>'HRK', 'country'=>'Croatia', 				'currency_name'=>'Kuna', 							'is_value_hex'=>1, 'symbol_html_value'=>'6b, 6e'),
+				array('currency_code'=>'CUP', 'country'=>'Cuba', 					'currency_name'=>'Pesos', 							'is_value_hex'=>1, 'symbol_html_value'=>'20b1'),
+				array('currency_code'=>'CZK', 'country'=>'Czech Republic', 			'currency_name'=>'Koruny', 							'is_value_hex'=>1, 'symbol_html_value'=>'4b, 10d'),
+				array('currency_code'=>'DKK', 'country'=>'Denmark', 				'currency_name'=>'Kroner', 							'is_value_hex'=>1, 'symbol_html_value'=>'6b, 72'),
+				array('currency_code'=>'DOP', 'country'=>'Dominican Republic', 		'currency_name'=>'Pesos', 							'is_value_hex'=>1, 'symbol_html_value'=>'52, 44, 24'),
+				array('currency_code'=>'XCD', 'country'=>'East Caribbean', 			'currency_name'=>'Dollars', 						'is_value_hex'=>1, 'symbol_html_value'=>'24'),
+				array('currency_code'=>'EGP', 'country'=>'Egypt', 					'currency_name'=>'Pounds', 							'is_value_hex'=>1, 'symbol_html_value'=>'a3'),
+				array('currency_code'=>'SVC', 'country'=>'El Salvador', 			'currency_name'=>'Colones', 						'is_value_hex'=>1, 'symbol_html_value'=>'24'),
+				array('currency_code'=>'EEK', 'country'=>'Estonia', 				'currency_name'=>'Krooni', 							'is_value_hex'=>1, 'symbol_html_value'=>'6b, 72'),
+				array('currency_code'=>'GHC', 'country'=>'Ghana', 					'currency_name'=>'Cedis', 							'is_value_hex'=>1, 'symbol_html_value'=>'a2'),
+				array('currency_code'=>'FKP', 'country'=>'Falkland Islands', 		'currency_name'=>'Pounds', 							'is_value_hex'=>1, 'symbol_html_value'=>'a3'),
+				array('currency_code'=>'FJD', 'country'=>'Fiji', 					'currency_name'=>'Dollars', 						'is_value_hex'=>1, 'symbol_html_value'=>'24'),
+				array('currency_code'=>'GIP', 'country'=>'Gibraltar', 				'currency_name'=>'Pounds', 							'is_value_hex'=>1, 'symbol_html_value'=>'a3'),
+				array('currency_code'=>'GTQ', 'country'=>'Guatemala', 				'currency_name'=>'Quetzales', 						'is_value_hex'=>1, 'symbol_html_value'=>'51'),
+				array('currency_code'=>'GGP', 'country'=>'Guernsey', 				'currency_name'=>'Pounds', 							'is_value_hex'=>1, 'symbol_html_value'=>'a3'),
+				array('currency_code'=>'GYD', 'country'=>'Guyana', 					'currency_name'=>'Dollars', 						'is_value_hex'=>1, 'symbol_html_value'=>'24'),
+				array('currency_code'=>'IMP', 'country'=>'Isle of Man', 			'currency_name'=>'Pounds', 							'is_value_hex'=>1, 'symbol_html_value'=>'a3'),
+				array('currency_code'=>'HNL', 'country'=>'Honduras', 				'currency_name'=>'Lempiras', 						'is_value_hex'=>1, 'symbol_html_value'=>'4c'),
+				array('currency_code'=>'HKD', 'country'=>'Hong Kong', 				'currency_name'=>'Dollars', 						'is_value_hex'=>1, 'symbol_html_value'=>'24'),
+				array('currency_code'=>'HUF', 'country'=>'Hungary', 				'currency_name'=>'Forint', 							'is_value_hex'=>1, 'symbol_html_value'=>'46, 74'),
+				array('currency_code'=>'ISK', 'country'=>'Iceland', 				'currency_name'=>'Kronur', 							'is_value_hex'=>1, 'symbol_html_value'=>'6b, 72'),
+				array('currency_code'=>'INR', 'country'=>'India', 					'currency_name'=>'Rupees', 							'is_value_hex'=>1, 'symbol_html_value'=>'20a8'),
+				array('currency_code'=>'IDR', 'country'=>'Indonesia', 				'currency_name'=>'Rupiahs', 						'is_value_hex'=>1, 'symbol_html_value'=>'52, 70'),
+				array('currency_code'=>'IRR', 'country'=>'Iran', 					'currency_name'=>'Rials', 							'is_value_hex'=>1, 'symbol_html_value'=>'fdfc'),
+				array('currency_code'=>'ILS', 'country'=>'Israel', 					'currency_name'=>'New Shekels', 					'is_value_hex'=>1, 'symbol_html_value'=>'20aa'),
+				array('currency_code'=>'JMD', 'country'=>'Jamaica', 				'currency_name'=>'Dollars', 						'is_value_hex'=>1, 'symbol_html_value'=>'4a, 24'),
+				array('currency_code'=>'JPY', 'country'=>'Japan', 					'currency_name'=>'Yen', 							'is_value_hex'=>1, 'symbol_html_value'=>'a5'),
+				array('currency_code'=>'JEP', 'country'=>'Jersey', 					'currency_name'=>'Pounds', 							'is_value_hex'=>1, 'symbol_html_value'=>'a3'),
+				array('currency_code'=>'KZT', 'country'=>'Kazakhstan', 				'currency_name'=>'Tenge', 							'is_value_hex'=>1, 'symbol_html_value'=>'43b, 432'),
+				array('currency_code'=>'KPW', 'country'=>'North Korea', 			'currency_name'=>'Won', 							'is_value_hex'=>1, 'symbol_html_value'=>'20a9'),
+				array('currency_code'=>'KRW', 'country'=>'South Korea', 			'currency_name'=>'Won', 							'is_value_hex'=>1, 'symbol_html_value'=>'20a9'),
+				array('currency_code'=>'KGS', 'country'=>'Kyrgyzstan', 				'currency_name'=>'Soms', 							'is_value_hex'=>1, 'symbol_html_value'=>'43b, 432'),
+				array('currency_code'=>'LAK', 'country'=>'Laos', 					'currency_name'=>'Kips', 							'is_value_hex'=>1, 'symbol_html_value'=>'20ad'),
+				array('currency_code'=>'LVL', 'country'=>'Latvia', 					'currency_name'=>'Lati', 							'is_value_hex'=>1, 'symbol_html_value'=>'4c, 73'),
+				array('currency_code'=>'LBP', 'country'=>'Lebanon', 				'currency_name'=>'Pounds', 							'is_value_hex'=>1, 'symbol_html_value'=>'a3'),
+				array('currency_code'=>'LRD', 'country'=>'Liberia', 				'currency_name'=>'Dollars', 						'is_value_hex'=>1, 'symbol_html_value'=>'24'),
+				array('currency_code'=>'CHF', 'country'=>'Switzerland', 			'currency_name'=>'Francs', 							'is_value_hex'=>1, 'symbol_html_value'=>'43, 48, 46'),
+				array('currency_code'=>'LTL', 'country'=>'Lithuania', 				'currency_name'=>'Litai', 							'is_value_hex'=>1, 'symbol_html_value'=>'4c, 74'),
+				array('currency_code'=>'MKD', 'country'=>'Macedonia', 				'currency_name'=>'Denars', 							'is_value_hex'=>1, 'symbol_html_value'=>'434, 435, 43d'),
+				array('currency_code'=>'MYR', 'country'=>'Malaysia', 				'currency_name'=>'Ringgits', 						'is_value_hex'=>1, 'symbol_html_value'=>'52, 4d'),
+				array('currency_code'=>'MUR', 'country'=>'Mauritius', 				'currency_name'=>'Rupees', 							'is_value_hex'=>1, 'symbol_html_value'=>'20a8'),
+				array('currency_code'=>'MXN', 'country'=>'Mexico', 					'currency_name'=>'Pesos', 							'is_value_hex'=>1, 'symbol_html_value'=>'24'),
+				array('currency_code'=>'MNT', 'country'=>'Mongolia', 				'currency_name'=>'Tugriks', 						'is_value_hex'=>1, 'symbol_html_value'=>'20ae'),
+				array('currency_code'=>'MZN', 'country'=>'Mozambique', 				'currency_name'=>'Meticais', 						'is_value_hex'=>1, 'symbol_html_value'=>'4d, 54'),
+				array('currency_code'=>'NAD', 'country'=>'Namibia', 				'currency_name'=>'Dollars', 						'is_value_hex'=>1, 'symbol_html_value'=>'24'),
+				array('currency_code'=>'NPR', 'country'=>'Nepal', 					'currency_name'=>'Rupees', 							'is_value_hex'=>1, 'symbol_html_value'=>'20a8'),
+				array('currency_code'=>'ANG', 'country'=>'Netherlands Antilles', 	'currency_name'=>'Guilders (also called Florins)', 	'is_value_hex'=>1, 'symbol_html_value'=>'192'),
+				array('currency_code'=>'SBD', 'country'=>'Solomon Islands', 		'currency_name'=>'Dollars', 						'is_value_hex'=>1, 'symbol_html_value'=>'24'),
+				array('currency_code'=>'NZD', 'country'=>'New Zealand', 			'currency_name'=>'Dollars', 						'is_value_hex'=>1, 'symbol_html_value'=>'24'),
+				array('currency_code'=>'NIO', 'country'=>'Nicaragua', 				'currency_name'=>'Cordobas', 						'is_value_hex'=>1, 'symbol_html_value'=>'43, 24'),
+				array('currency_code'=>'NGN', 'country'=>'Nigeria', 				'currency_name'=>'Nairas', 							'is_value_hex'=>1, 'symbol_html_value'=>'20a6'),
+				array('currency_code'=>'NOK', 'country'=>'Norway', 					'currency_name'=>'Krone', 							'is_value_hex'=>1, 'symbol_html_value'=>'6b, 72'),
+				array('currency_code'=>'OMR', 'country'=>'Oman', 					'currency_name'=>'Rials', 							'is_value_hex'=>1, 'symbol_html_value'=>'fdfc'),
+				array('currency_code'=>'PKR', 'country'=>'Pakistan', 				'currency_name'=>'Rupees', 							'is_value_hex'=>1, 'symbol_html_value'=>'20a8'),
+				array('currency_code'=>'PAB', 'country'=>'Panama', 					'currency_name'=>'Balboa', 							'is_value_hex'=>1, 'symbol_html_value'=>'42, 2f, 2e'),
+				array('currency_code'=>'PYG', 'country'=>'Paraguay', 				'currency_name'=>'Guarani', 						'is_value_hex'=>1, 'symbol_html_value'=>'47, 73'),
+				array('currency_code'=>'PEN', 'country'=>'Peru', 					'currency_name'=>'Nuevos Soles', 					'is_value_hex'=>1, 'symbol_html_value'=>'53, 2f, 2e'),
+				array('currency_code'=>'PHP', 'country'=>'Philippines', 			'currency_name'=>'Pesos', 							'is_value_hex'=>1, 'symbol_html_value'=>'50, 68, 70'),
+				array('currency_code'=>'PLN', 'country'=>'Poland', 					'currency_name'=>'Zlotych', 						'is_value_hex'=>1, 'symbol_html_value'=>'7a, 142'),
+				array('currency_code'=>'QAR', 'country'=>'Qatar', 					'currency_name'=>'Rials', 							'is_value_hex'=>1, 'symbol_html_value'=>'fdfc'),
+				array('currency_code'=>'RON', 'country'=>'Romania', 				'currency_name'=>'New Lei', 						'is_value_hex'=>1, 'symbol_html_value'=>'6c, 65, 69'),
+				array('currency_code'=>'RUB', 'country'=>'Russia', 					'currency_name'=>'Rubles', 							'is_value_hex'=>1, 'symbol_html_value'=>'440, 443, 431'),
+				array('currency_code'=>'SHP', 'country'=>'Saint Helena', 			'currency_name'=>'Pounds', 							'is_value_hex'=>1, 'symbol_html_value'=>'a3'),
+				array('currency_code'=>'SAR', 'country'=>'Saudi Arabia', 			'currency_name'=>'Riyals', 							'is_value_hex'=>1, 'symbol_html_value'=>'fdfc'),
+				array('currency_code'=>'RSD', 'country'=>'Serbia', 					'currency_name'=>'Dinars', 							'is_value_hex'=>1, 'symbol_html_value'=>'414, 438, 43d, 2e'),
+				array('currency_code'=>'SCR', 'country'=>'Seychelles', 				'currency_name'=>'Rupees', 							'is_value_hex'=>1, 'symbol_html_value'=>'20a8'),
+				array('currency_code'=>'SGD', 'country'=>'Singapore', 				'currency_name'=>'Dollars', 						'is_value_hex'=>1, 'symbol_html_value'=>'24'),
+				array('currency_code'=>'SOS', 'country'=>'Somalia', 				'currency_name'=>'Shillings', 						'is_value_hex'=>1, 'symbol_html_value'=>'53'),
+				array('currency_code'=>'ZAR', 'country'=>'South Africa', 			'currency_name'=>'Rand', 							'is_value_hex'=>1, 'symbol_html_value'=>'52'),
+				array('currency_code'=>'LKR', 'country'=>'Sri Lanka', 				'currency_name'=>'Rupees', 							'is_value_hex'=>1, 'symbol_html_value'=>'20a8'),
+				array('currency_code'=>'SEK', 'country'=>'Sweden', 					'currency_name'=>'Kronor', 							'is_value_hex'=>1, 'symbol_html_value'=>'6b, 72'),
+				array('currency_code'=>'SRD', 'country'=>'Suriname', 				'currency_name'=>'Dollars', 						'is_value_hex'=>1, 'symbol_html_value'=>'24'),
+				array('currency_code'=>'SYP', 'country'=>'Syria', 					'currency_name'=>'Pounds', 							'is_value_hex'=>1, 'symbol_html_value'=>'a3'),
+				array('currency_code'=>'TWD', 'country'=>'Taiwan', 					'currency_name'=>'New Dollars', 					'is_value_hex'=>1, 'symbol_html_value'=>'4e, 54, 24'),
+				array('currency_code'=>'THB', 'country'=>'Thailand', 				'currency_name'=>'Baht', 							'is_value_hex'=>1, 'symbol_html_value'=>'e3f'),
+				array('currency_code'=>'TTD', 'country'=>'Trinidad and Tobago', 	'currency_name'=>'Dollars', 						'is_value_hex'=>1, 'symbol_html_value'=>'54, 54, 24'),
+				array('currency_code'=>'TRY', 'country'=>'Turkey', 					'currency_name'=>'Lira', 							'is_value_hex'=>1, 'symbol_html_value'=>'54, 4c'),
+				array('currency_code'=>'TRL', 'country'=>'Turkey', 					'currency_name'=>'Liras', 							'is_value_hex'=>1, 'symbol_html_value'=>'20a4'),
+				array('currency_code'=>'TVD', 'country'=>'Tuvalu', 					'currency_name'=>'Dollars', 						'is_value_hex'=>1, 'symbol_html_value'=>'24'),
+				array('currency_code'=>'UAH', 'country'=>'Ukraine', 				'currency_name'=>'Hryvnia', 						'is_value_hex'=>1, 'symbol_html_value'=>'20b4'),
+				array('currency_code'=>'UYU', 'country'=>'Uruguay', 				'currency_name'=>'Pesos', 							'is_value_hex'=>1, 'symbol_html_value'=>'24, 55'),
+				array('currency_code'=>'UZS', 'country'=>'Uzbekistan', 				'currency_name'=>'Sums', 							'is_value_hex'=>1, 'symbol_html_value'=>'43b, 432'),
+				array('currency_code'=>'VEF', 'country'=>'Venezuela', 				'currency_name'=>'Bolivares Fuertes', 				'is_value_hex'=>1, 'symbol_html_value'=>'42, 73'),
+				array('currency_code'=>'VND', 'country'=>'Vietnam', 				'currency_name'=>'Dong', 							'is_value_hex'=>1, 'symbol_html_value'=>'20ab'),
+				array('currency_code'=>'YER', 'country'=>'Yemen', 					'currency_name'=>'Rials', 							'is_value_hex'=>1, 'symbol_html_value'=>'fdfc'),
+				array('currency_code'=>'ZWD', 'country'=>'Zimbabwe', 				'currency_name'=>'Zimbabwe Dollars', 				'is_value_hex'=>1, 'symbol_html_value'=>'5a, 24')
+			);
+			foreach ($currencies as $currency) {
+				foreach ($currency as $key=>$value)
+					$this->db->set($key, $value);
+				$this->db->insert('currencies');
+			}
+			
+			// If no default currency is selected, set USD as the default.
+			$defaultCurrency = $this->db->get('settings')->row()->currency_type;
+			if ($defaultCurrency == NULL || $defaultCurrency == '') {
+				$this->db->set('currency_type', 'USD');
+				$this->db->where('id', 1);
+				$this->db->update('settings');
+			}
+			
+			
+			// Add currency_code column to the clients table
+			$field = array(
+							'currency_code' 	=> array('type' => 'VARCHAR', 'constraint' => 3, 'default' => NULL),
+						);
+			$this->dbforge->add_column('clients', $field);
+			
+			// Add currency_code column to the invoices table
+			$field = array(
+							'currency_code' 	=> array('type' => 'VARCHAR', 'constraint' => 3, 'default' => NULL),
+						);
+			$this->dbforge->add_column('invoices', $field);
+
+			
+			// Update the version number
+			$this->db->set('bambooinvoice_version', '0.8.9a');
+			$this->db->where('id', 1);
+			$this->db->update('settings');
+
+			$updates .= "<li>Upgrade to 0.8.9a success.</li>";
+		}
+
 		$updates .= '</ul>';
 
 		// everything's done now, let's optimize and then brag

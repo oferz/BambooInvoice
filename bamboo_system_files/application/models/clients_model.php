@@ -14,9 +14,9 @@ class clients_model extends Model {
 
 		return $this->db->count_all_results('invoices');
 	}
-
+	
 	// --------------------------------------------------------------------
-
+	
 	function getAllClients()
 	{
 		// we need an array of company names to associate each contact with its company
@@ -113,6 +113,27 @@ class clients_model extends Model {
 			return TRUE;
 		}
 	}
+
+	// --------------------------------------------------------------------
+	
+	function getClientCurrency($client_id)
+	{
+		$clientInfo = $this->get_client_info($client_id);
+		if (!is_array($clientInfo))
+		{
+			$clientInfo = (array) $clientInfo;
+		}
+		
+		if ($clientInfo != NULL and count($clientInfo) > 0 and $clientInfo['currency_code'] != NULL and $clientInfo['currency_code'] != '')
+		{
+			return $clientInfo['currency_code'];
+		}
+		else
+		{
+			return $this->currencies_model->getDefaultCurrency();
+		}
+	}
+
 
 }
 ?>

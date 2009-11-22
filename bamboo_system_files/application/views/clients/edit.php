@@ -28,6 +28,19 @@ $this->load->view('header');
 	<?php endif;?>
 	</fieldset>
 
+	<p id="current_currency_container">
+		<label>
+			<span><?php echo $this->lang->line('settings_currency_type');?>: </span>
+			<span id="currency_selector_container">
+				<?php echo $this->load->view('currencies/selection_list', array('with_system_default'=>true, 'selected_currency'=>$selected_currency)); ?>
+			</span>
+		</label>
+	</p>
+	
+	<!-- put a spacer between the field and the submit button -->
+	<div style="clear: both; padding: 2px;"/>
+
+
 	<p><?php echo form_submit('updateClient', $this->lang->line('clients_update_client'), 'id="updateClient"');?></p>
 
 <?php echo form_close();?>

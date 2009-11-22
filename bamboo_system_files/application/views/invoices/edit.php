@@ -29,9 +29,19 @@ $this->load->view('header');
 			<label><?php echo $this->lang->line('invoice_date_issued');?> <input type="text" name="dateIssued" id="dateIssued" value="<?php echo ($this->validation->dateIssued) ? ($this->validation->dateIssued) : ($row->dateIssued);?>"/></label>
 			<span id="dateIssuedDisplay"><?php echo date('F d, Y', mysql_to_unix(($this->validation->dateIssued) ? ($this->validation->dateIssued) : ($row->dateIssued)));?></span> <a href="#" id="changeDate" onclick="createInvoiceDate.toggle()"><?php echo $this->lang->line('actions_change');?></a>
 		</p>
-			<div id="cal1Container" style="display: none;">
-				<?php echo js_calendar_write('entry_date', time($row->dateIssued), true);?>
-			</div>
+		<div id="cal1Container" style="display: none;">
+			<?php echo js_calendar_write('entry_date', time($row->dateIssued), true);?>
+		</div>
+
+		<p id="current_currency_container">
+			<label>
+				<?php echo $this->lang->line('invoice_current_currency');?>: 
+				<span id="currency_selector_container">
+					<?php echo $this->load->view('currencies/selection_list', array('selected_currency'=>$selected_currency)); ?>
+				</span>
+			</label>
+		</p>
+
 
 		<div class="work_description">
 
@@ -62,7 +72,7 @@ $this->load->view('header');
 						</p>
 					</td>
 					<td><p><label><input type="checkbox" name="items[<?php echo $item_count;?>][taxable]" value="1" onclick="recalculate_items();" <?php if ($item->taxable == 1) {echo 'checked="checked" ';}?>/><span><?php echo $this->lang->line('invoice_taxable');?>?</span></label></p></td>
-					<td nowrap="nowrap"><p><label><span><?php echo $this->lang->line('invoice_amount');?></span><?php echo $this->settings_model->get_setting('currency_symbol');?><input type="text" id="amount" name="items[<?php echo $item_count;?>][amount]" size="5" value="<?php echo $item->amount;?>" onkeyup="recalculate_items();" value="" /></label></p></td>
+					<td nowrap="nowrap"><p><?php echo $currency_symbol;?><label><span><?php echo $this->lang->line('invoice_amount');?></span><input type="text" id="amount" name="items[<?php echo $item_count;?>][amount]" size="5" value="<?php echo $item->amount;?>" onkeyup="recalculate_items();" value="" /></label></p></td>
 					<td>
 					<?php if ($item_count > 1):?>
 					<p><img alt="X" src="<?php echo base_url();?>img/cancel.png" onclick="$('item_area').removeChild($('item<?php echo $item_count;?>'));"/></p>
@@ -78,14 +88,14 @@ $this->load->view('header');
 		</div>
 
 		<div class="amount_listing">
-			<p><?php echo $this->lang->line('invoice_amount');?> <?php echo $this->settings_model->get_setting('currency_symbol');?><span id="item_amount">0.00</span></p>
+			<p><?php echo $this->lang->line('invoice_amount');?> <?php echo $currency_symbol;?><span id="item_amount">0.00</span></p>
 			<?php if ($row->tax1_rate > 0):?>
-			<p><?php echo $row->tax1_desc;?> (<?php echo $row->tax1_rate;?>%) <?php echo $this->settings_model->get_setting('currency_symbol');?><span id="item_tax1amount">0.00</span></p>
+			<p><?php echo $row->tax1_desc;?> (<?php echo $row->tax1_rate;?>%) <?php echo $currency_symbol;?><span id="item_tax1amount">0.00</span></p>
 			<?php endif;?>
 			<?php if ($row->tax2_rate > 0):?>
-			<p><?php echo $row->tax2_desc;?> (<?php echo $row->tax2_rate;?>%) <?php echo $this->settings_model->get_setting('currency_symbol');?><span id="item_tax2amount">0.00</span></p>
+			<p><?php echo $row->tax2_desc;?> (<?php echo $row->tax2_rate;?>%) <?php echo $currency_symbol;?><span id="item_tax2amount">0.00</span></p>
 			<?php endif;?>
-			<p><?php echo $this->lang->line('invoice_total');?> <?php echo $this->settings_model->get_setting('currency_symbol');?><span id="item_total_amount">0.00</span></p>
+			<p><?php echo $this->lang->line('invoice_total');?> <?php echo $currency_symbol;?> <span id="item_total_amount">0.00</span></p>
 		</div>
 
 		<p>

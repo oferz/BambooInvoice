@@ -207,8 +207,25 @@ $this->load->view('header');
 
 					<p>
 						<label for="currency_type"><span><?php echo $this->lang->line('settings_currency_type');?></span></label>
-						<input class="requiredfield" name="currency_type" type="text" id="currency_type" size="20" value="<?php echo ($this->validation->currency_type) ? ($this->validation->currency_type) : ($row->currency_type);?>" />
+							<span id="currency_selector_container">
+								<?php echo $this->load->view('currencies/selection_list'); ?>
+							</span>
+<!--						<input class="requiredfield" name="currency_type" type="text" id="currency_type" size="20" value="<?php echo ($this->validation->currency_type) ? ($this->validation->currency_type) : ($row->currency_type);?>" /> -->
 						<?php echo $this->validation->currency_type_error; ?>
+						<script type="text/javascript">
+							function getCurrenctCurrencySymbol()
+							{
+								return $('currency_selector').options[$('currency_selector').selectedIndex].label;
+							}
+
+							function currencyChanged ()
+							{
+								var currency_symbol = getCurrenctCurrencySymbol();
+								$('currency_symbol').value = currency_symbol;
+							}
+							
+							Event.observe('currency_selector', 'change', currencyChanged);
+						</script>
 					</p>
 
 					<p>
