@@ -69,6 +69,13 @@ function drawTable(invoiceArray) {
 	container.appendChild(theData);
 	row.appendChild(container);
 
+	// Sent status display (by O.Z)
+	var container = document.createElement('th');
+	var theData = document.createTextNode(lang_sent_status);
+	container.className="sent_status";
+	container.appendChild(theData);
+	row.appendChild(container);
+
 	tbody.appendChild(row);
 	
 	for(i = 0; i < invoiceArray['invoices'].length; i++) {
@@ -80,7 +87,7 @@ function drawTable(invoiceArray) {
 
 			var row = document.createElement('tr');
 			var container = document.createElement('td');
-			container.setAttribute('colspan','5');
+			container.setAttribute('colspan','6');
 			container.setAttribute('class','monthbreak');
 
 			var hr = document.createTextNode(invoice_id.substring(10));
@@ -141,6 +148,17 @@ function drawTable(invoiceArray) {
 			var theLink = document.createElement('a');
 			theLink.setAttribute ('href', base_url+'invoices/view/'+invoiceArray['invoices'][i].invoiceId);
 			var theData = document.createTextNode(invoiceArray['invoices'][i].status);
+			theLink.appendChild(theData);
+			container.appendChild(theLink);
+			row.appendChild(container);
+			
+			// Sent status display (by O.Z)
+			var container = document.createElement('td');
+			var theLink = document.createElement('a');
+			theLink.setAttribute ('href', base_url+'invoices/view/'+invoiceArray['invoices'][i].invoiceId);
+			var theData = document.createElement('span');
+//			theData.className = (invoiceArray['invoices'][i].sent) ? 'invoice_sent' : 'invoice_not_sent';
+			theData.setAttribute('class', (invoiceArray['invoices'][i].sent==1) ? 'invoice_sent' : 'invoice_not_sent');
 			theLink.appendChild(theData);
 			container.appendChild(theLink);
 			row.appendChild(container);

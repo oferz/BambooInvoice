@@ -71,6 +71,7 @@ lang_invoice = new String("<?php echo ($this->lang->line('invoice_invoice'));?>"
 lang_client_name = new String("<?php echo ($this->lang->line('clients_name'));?>");
 lang_amount = new String("<?php echo ($this->lang->line('invoice_amount'));?>");
 lang_status = new String("<?php echo ($this->lang->line('invoice_status'));?>");
+lang_sent_status = new String("<?php echo ($this->lang->line('invoice_sent_status'));?>");
 lang_quantity = new String("<?php echo ($this->lang->line('invoice_quantity'));?>");
 lang_work_description = new String("<?php echo ($this->lang->line('invoice_work_description'));?>");
 lang_taxable = new String("<?php echo ($this->lang->line('invoice_taxable'));?>");

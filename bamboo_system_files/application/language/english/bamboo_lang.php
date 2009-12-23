@@ -139,6 +139,7 @@ $lang['invoice_select_client'] = 'Select client';
 $lang['invoice_send_to'] = 'Send this invoice to';
 $lang['invoice_sent_to'] = 'Invoice sent to';
 $lang['invoice_status'] = 'Status';
+$lang['invoice_sent_status'] = 'Sent';
 $lang['invoice_summary'] = 'Summary';
 $lang['invoice_sure_delete'] = 'Are you sure you want to do this? ';
 $lang['invoice_tax1_description'] = 'Name of tax charged';
