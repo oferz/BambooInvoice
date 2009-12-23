@@ -11,6 +11,7 @@ if (isset($pagination)) {
 		<th class="clientName"><?php echo $this->lang->line('clients_name');?></th>
 		<th class="amount"><?php echo $this->lang->line('invoice_amount');?></th>
 		<th class="status"><?php echo $this->lang->line('invoice_status');?></th>
+		<th class="sent_status"><?php echo $this->lang->line('invoice_sent_status'); ?></th>
 	</tr>
 <?php
 if (isset($total_rows) && $total_rows == 0):
@@ -34,7 +35,7 @@ if (isset($total_rows) && $total_rows == 0):
 ?>
 
 	<tr>
-		<td colspan="5" class="monthbreak"><?php echo date('F', $invoice_date);?></td>
+		<td colspan="6" class="monthbreak"><?php echo date('F', $invoice_date);?></td>
 	</tr>
 
 <?php 
@@ -69,6 +70,13 @@ if (isset($total_rows) && $total_rows == 0):
 		$line = "<span class='error'>" . timespan($due_date, now()) . ' '.$this->lang->line('invoice_overdue').'</span>';
 		echo anchor('invoices/view/'.$row->id, $line, array('title' => 'invoice status'));
 		}
+		?>
+		</td>
+		<td>
+		<?php
+			// Display sent status (added by O.Z)
+			$line = "<span class='" . (($row->sent) ? 'invoice_sent' : 'invoice_not_sent') . "'></span>";
+			echo anchor('invoices/view/'.$row->id, $line, array('title' => 'invoice sent status'));
 		?>
 		</td>
 	</tr>

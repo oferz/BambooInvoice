@@ -23,13 +23,13 @@ class Invoices extends MY_Controller {
 		$data['extraHeadContent'] .= "<link type=\"text/css\" rel=\"stylesheet\" href=\"". base_url()."css/invoice.css\" />\n";
 		$offset = (int) $this->uri->segment(3, 0);
 
-		$data['query'] = $this->invoices_model->getInvoices('open', $this->settings_model->get_setting('days_payment_due'), $offset, 5000);
+		$data['query'] = $this->invoices_model->getInvoices('open', $this->settings_model->get_setting('days_payment_due'), $offset, 5000, TRUE);
 
 		$data['short_description'] = $this->invoices_model->build_short_descriptions();
 
 		$data['total_rows'] = ($data['query']) ? $data['query']->num_rows() : 0;
 
-		$overdue_count = $this->invoices_model->getInvoices('overdue', $this->settings_model->get_setting('days_payment_due'), 0, 5000);
+		$overdue_count = $this->invoices_model->getInvoices('overdue', $this->settings_model->get_setting('days_payment_due'), 0, 5000, FALSE);
 
 		$data['overdue_count'] = ($overdue_count) ? $overdue_count->num_rows() : 0;
 
@@ -49,11 +49,11 @@ class Invoices extends MY_Controller {
 		$data['extraHeadContent'] = "<script type=\"text/javascript\" src=\"". base_url()."js/newinvoice.js\"></script>\n";
 		$data['extraHeadContent'] .= "<link type=\"text/css\" rel=\"stylesheet\" href=\"". base_url()."css/invoice.css\" />\n";
 
-		$data['query'] = $this->invoices_model->getInvoices('overdue', $this->settings_model->get_setting('days_payment_due'), $offset, 20);
+		$data['query'] = $this->invoices_model->getInvoices('overdue', $this->settings_model->get_setting('days_payment_due'), $offset, 20, TRUE);
 
 		$data['total_rows'] = $data['query']->num_rows();
 		$config['base_url'] = site_url('invoices/overdue');
-		$config['total_rows'] = $this->invoices_model->getInvoices('overdue', $this->settings_model->get_setting('days_payment_due'), 0, 10000)->num_rows();
+		$config['total_rows'] = $this->invoices_model->getInvoices('overdue', $this->settings_model->get_setting('days_payment_due'), 0, 10000, FALSE)->num_rows();
 		$this->pagination->initialize($config); 
 		$data['pagination'] = $this->pagination->create_links();
 
@@ -70,12 +70,12 @@ class Invoices extends MY_Controller {
 		$data['extraHeadContent'] = "<script type=\"text/javascript\" src=\"". base_url()."js/newinvoice.js\"></script>\n";
 		$data['extraHeadContent'] .= "<link type=\"text/css\" rel=\"stylesheet\" href=\"". base_url()."css/invoice.css\" />\n";
 
-		$data['query'] = $this->invoices_model->getInvoices('open', $this->settings_model->get_setting('days_payment_due'), $offset, 20);
+		$data['query'] = $this->invoices_model->getInvoices('open', $this->settings_model->get_setting('days_payment_due'), $offset, 20, TRUE);
 
 		$data['total_rows'] = $data['query']->num_rows();
 
 		$config['base_url'] = site_url('invoices/open');
-		$config['total_rows'] = $this->invoices_model->getInvoices('open', $this->settings_model->get_setting('days_payment_due'), 0, 10000)->num_rows();
+		$config['total_rows'] = $this->invoices_model->getInvoices('open', $this->settings_model->get_setting('days_payment_due'), 0, 10000, FALSE)->num_rows();
 		$this->pagination->initialize($config); 
 		$data['pagination'] = $this->pagination->create_links();
 
@@ -92,12 +92,12 @@ class Invoices extends MY_Controller {
 		$data['extraHeadContent'] = "<script type=\"text/javascript\" src=\"". base_url()."js/newinvoice.js\"></script>\n";
 		$data['extraHeadContent'] .= "<link type=\"text/css\" rel=\"stylesheet\" href=\"". base_url()."css/invoice.css\" />\n";
 
-		$data['query'] = $this->invoices_model->getInvoices('closed', $this->settings_model->get_setting('days_payment_due'), $offset, 20);
+		$data['query'] = $this->invoices_model->getInvoices('closed', $this->settings_model->get_setting('days_payment_due'), $offset, 20, TRUE);
 
 		$data['total_rows'] = $data['query']->num_rows();
 
 		$config['base_url'] = site_url('invoices/closed');
-		$config['total_rows'] = $this->invoices_model->getInvoices('closed', $this->settings_model->get_setting('days_payment_due'), 0, 10000)->num_rows();
+		$config['total_rows'] = $this->invoices_model->getInvoices('closed', $this->settings_model->get_setting('days_payment_due'), 0, 10000, FALSE)->num_rows();
 		$this->pagination->initialize($config); 
 		$data['pagination'] = $this->pagination->create_links();
 
@@ -114,10 +114,10 @@ class Invoices extends MY_Controller {
 		$data['extraHeadContent'] = "<script type=\"text/javascript\" src=\"". base_url()."js/newinvoice.js\"></script>\n";
 		$data['extraHeadContent'] .= "<link type=\"text/css\" rel=\"stylesheet\" href=\"". base_url()."css/invoice.css\" />\n";
 
-		$data['query'] = $this->invoices_model->getInvoices('all', $this->settings_model->get_setting('days_payment_due'), $offset, 20);
+		$data['query'] = $this->invoices_model->getInvoices('all', $this->settings_model->get_setting('days_payment_due'), $offset, 20, TRUE);
 		$data['total_rows'] = $data['query']->num_rows();
 
-		$config['total_rows'] = $this->invoices_model->getInvoices('all', $this->settings_model->get_setting('days_payment_due'), 0, 10000)->num_rows();
+		$config['total_rows'] = $this->invoices_model->getInvoices('all', $this->settings_model->get_setting('days_payment_due'), 0, 10000, FALSE)->num_rows();
 		$config['base_url'] = site_url('invoices/all');
 		$this->pagination->initialize($config); 
 		$data['pagination'] = $this->pagination->create_links();
@@ -935,6 +935,9 @@ class Invoices extends MY_Controller {
 				
 				// Currencies (Added by O.Z)
 				$invoiceResults .= ', "currency" : "' . $this->currencies_model->getCurrencySymbol($row->currency_code, false) . '"';
+				
+				// Sent status (Added by O.Z)
+				$invoiceResults .= ', "sent" : "' . $row->sent . '"';
 
 				$invoiceResults .= ' }, ';
 				$last_retrieved_month = date('F', $invoice_date);
