@@ -169,9 +169,9 @@ class invoices_model extends Model {
 
 	// --------------------------------------------------------------------
 
-	function getInvoices($status, $days_payment_due = 30, $offset=0, $limit=100)
+	function getInvoices($status, $days_payment_due = 30, $offset=0, $limit=100, $sent_status=TRUE)   // $sent_status added by O.Z
     {
-		return $this->_getInvoices(FALSE, FALSE, $status, $days_payment_due, $offset, $limit);
+		return $this->_getInvoices(FALSE, FALSE, $status, $days_payment_due, $offset, $limit, $sent_status);
 	}
 
 	// --------------------------------------------------------------------
@@ -183,7 +183,7 @@ class invoices_model extends Model {
 
 	// --------------------------------------------------------------------
 
-	function _getInvoices($invoice_id, $client_id, $status, $days_payment_due = 30, $offset=0, $limit=100)
+	function _getInvoices($invoice_id, $client_id, $status, $days_payment_due = 30, $offset=0, $limit=100, $sent_status=TRUE)  // $sent_status added by O.Z
     {
 		// check for any invoices first
 		if ($this->db->count_all_results('invoices') < 1)
@@ -222,6 +222,12 @@ class invoices_model extends Model {
 		$this->db->select('(SELECT SUM(amount_paid) FROM '.$this->db->dbprefix('invoice_payments').' WHERE invoice_id='.$this->db->dbprefix('invoices').'.id) AS amount_paid', FALSE); 
 		$this->db->select('TO_DAYS('.$this->db->dbprefix('invoices').'.dateIssued) - TO_DAYS(curdate()) AS daysOverdue', FALSE);
 		$this->db->select('ROUND((SELECT SUM('.$this->db->dbprefix('invoice_items').'.amount * '.$this->db->dbprefix('invoice_items').'.quantity + ('.$this->db->dbprefix('invoice_items').'.amount * '.$this->db->dbprefix('invoice_items').'.quantity * ('.$this->db->dbprefix('invoices').'.tax1_rate/100 + '.$this->db->dbprefix('invoices').'.tax2_rate/100) * '.$this->db->dbprefix('invoice_items').'.taxable)) FROM '.$this->db->dbprefix('invoice_items').' WHERE '.$this->db->dbprefix('invoice_items').'.invoice_id='.$this->db->dbprefix('invoices').'.id), 2) AS subtotal', FALSE);
+		
+		// Get sent status (Added by O.Z)
+		if ($sent_status)
+		{
+			$this->db->select('((SELECT COUNT(*) FROM ' . $this->db->dbprefix('invoice_histories') . ' WHERE invoice_id=' . $this->db->dbprefix('invoices') . '.id AND contact_type=1) > 0) AS sent', FALSE);
+		}
 
 		$this->db->join('clients', 'invoices.client_id = clients.id');
 		$this->db->join('invoice_items', 'invoices.id = invoice_items.invoice_id', 'left');

@@ -115,6 +115,9 @@ table.stripe td {
 					<?php echo $companyInfo->country;?> 
 					<?php echo $companyInfo->postal_code;?><br />
 					<?php echo auto_link(prep_url($companyInfo->website));?>
+					<?php if ($companyInfo->tax_code != ''):?>
+						<?php echo "<br/>" . $this->lang->line('settings_tax_code') . ": " . $companyInfo->tax_code;?>
+					<?php endif;?>
 				</p>
 			</td>
 		</tr>
@@ -166,10 +169,6 @@ table.stripe td {
 		<strong><?php echo $this->lang->line('invoice_payment_term');?>: <?php echo $this->settings_model->get_setting('days_payment_due');?> <?php echo $this->lang->line('date_days');?></strong> 
 		(<?php echo $date_invoice_due;?>)
 	</p>
-
-	<?php if ($companyInfo->tax_code != ''):?>
-	<p><?php echo $companyInfo->tax_code;?></p>
-	<?php endif;?>
 
 	<p><?php echo auto_typography($row->invoice_note);?></p>
 

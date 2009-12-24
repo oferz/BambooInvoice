@@ -524,3 +524,13 @@ fieldset input {
 #admin_list li {
 	line-height: 16px;
 }
+
+/*
+ * Invoice Listing
+ */
+#invoiceRows .invoice_sent {
+	display: block;
+	width: 16px;
+	height: 16px;
+	background: transparent url(../img/accept.png) center center no-repeat;
+}
